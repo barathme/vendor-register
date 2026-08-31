@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Vendor Register — College Procurement ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E4; --paper2:#EFE7D2; --card:#FFFDF6; --ink:#232B36; --ink-soft:#5C6B72;
+    --ink-faint:#8C8672; --rule:#D7CDAE; --brass:#B8863B; --brass-dark:#8C6526;
+    --green:#3F6B4B; --green-bg:#E4EEE3; --rust:#A6432E; --rust-bg:#F6E3DD;
+    --shadow:0 1px 2px rgba(35,43,54,0.08); --radius:6px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.5;padding-bottom:80px;}
+  h1,h2,h3{font-family:'Lora',serif;font-weight:600;margin:0;color:var(--ink);}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  header.topbar{background:var(--ink);color:var(--paper);padding:16px;position:sticky;top:0;z-index:20;box-shadow:0 2px 6px rgba(0,0,0,0.15);}
+  header.topbar .brand{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  header.topbar .left{display:flex;align-items:center;gap:10px;}
+  header.topbar .seal{width:34px;height:34px;border-radius:50%;border:2px solid var(--brass);display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-weight:600;font-size:14px;color:var(--brass);flex-shrink:0;}
+  header.topbar h1{color:var(--paper);font-size:16px;}
+  header.topbar p{margin:2px 0 0;font-size:11px;color:#C7BFA6;}
+  header.topbar button.signout{background:none;border:1px solid #5A5F52;color:var(--paper);font-size:11.5px;padding:6px 10px;border-radius:4px;}
+  nav.tabs{display:flex;overflow-x:auto;gap:2px;background:var(--paper2);border-bottom:1px solid var(--rule);position:sticky;top:66px;z-index:19;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  nav.tabs::-webkit-scrollbar{display:none;}
+  nav.tabs button{flex:0 0 auto;background:transparent;border:none;padding:10px 14px;font-size:12.5px;font-weight:500;color:var(--ink-soft);border-bottom:3px solid transparent;white-space:nowrap;cursor:pointer;}
+  nav.tabs button.active{color:var(--ink);border-bottom-color:var(--brass);}
+  main{padding:14px;max-width:640px;margin:0 auto;}
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow);}
+  .card h3{font-size:14px;margin-bottom:8px;}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  .stat{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow);}
+  .stat .label{font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.5px;}
+  .stat .value{font-family:'Lora',serif;font-size:21px;font-weight:600;margin-top:3px;}
+  .stat .value.brass{color:var(--brass-dark);}
+  .stat .value.green{color:var(--green);}
+  input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--rule);border-radius:4px;background:#fff;color:var(--ink);font-size:13.5px;margin-top:4px;}
+  textarea{resize:vertical;min-height:56px;}
+  label{font-size:12px;color:var(--ink-soft);font-weight:500;display:block;margin-top:10px;}
+  label:first-child{margin-top:0;}
+  button.btn{background:var(--ink);color:var(--paper);border:none;border-radius:4px;padding:10px 16px;font-size:13.5px;font-weight:500;cursor:pointer;}
+  button.btn.brass{background:var(--brass-dark);}
+  button.btn.outline{background:transparent;color:var(--ink);border:1px solid var(--ink);}
+  button.btn.small{padding:6px 10px;font-size:12px;}
+  button.btn.full{width:100%;margin-top:12px;}
+  .row{display:flex;gap:8px;} .row>*{flex:1;}
+  .vendor-item{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);padding:11px 12px;margin-bottom:8px;box-shadow:var(--shadow);cursor:pointer;}
+  .vendor-item .name{font-family:'Lora',serif;font-weight:600;font-size:14.5px;}
+  .vendor-item .meta{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:0.3px;padding:2px 7px;border-radius:20px;text-transform:uppercase;}
+  .badge.cat{background:var(--paper2);color:var(--brass-dark);border:1px solid var(--rule);}
+  .badge.paid{background:var(--green-bg);color:var(--green);}
+  .badge.nobill{background:var(--rust-bg);color:var(--rust);}
+  .badge.role{background:#EAE3F5;color:#5B3E96;}
+  .entry-row{border-bottom:1px solid var(--rule);padding:9px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .entry-row:last-child{border-bottom:none;}
+  .entry-row .desc{font-weight:500;font-size:13px;}
+  .entry-row .sub{font-size:11px;color:var(--ink-soft);margin-top:1px;}
+  .entry-row .amt{font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:13.5px;white-space:nowrap;}
+  .empty{text-align:center;padding:30px 10px;color:var(--ink-faint);}
+  .fab{position:fixed;bottom:20px;right:20px;z-index:25;background:var(--brass-dark);color:#fff;border:none;border-radius:50%;width:54px;height:54px;font-size:26px;box-shadow:0 3px 10px rgba(0,0,0,0.3);cursor:pointer;}
+  .modal-bg{position:fixed;inset:0;background:rgba(35,43,54,0.55);z-index:30;display:flex;align-items:flex-end;justify-content:center;}
+  .modal{background:var(--paper);width:100%;max-width:640px;max-height:88vh;overflow-y:auto;border-radius:14px 14px 0 0;padding:16px;box-shadow:0 -4px 20px rgba(0,0,0,0.3);}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .modal-head h2{font-size:16px;}
+  .close-x{background:none;border:none;font-size:20px;color:var(--ink-soft);cursor:pointer;padding:4px;}
+  .search-box{position:relative;margin-bottom:12px;}
+  .divider-label{font-size:11px;color:var(--brass-dark);text-transform:uppercase;letter-spacing:0.6px;font-weight:600;margin:16px 0 6px;}
+  .price-trend{font-size:11px;font-weight:600;padding:1px 6px;border-radius:10px;}
+  .price-trend.up{background:var(--rust-bg);color:var(--rust);}
+  .price-trend.down{background:var(--green-bg);color:var(--green);}
+  .price-trend.flat{background:var(--paper2);color:var(--ink-soft);}
+  .hint{font-size:11.5px;color:var(--ink-faint);margin-top:4px;}
+  .ocr-box{background:var(--paper2);border:1px dashed var(--rule);border-radius:6px;padding:12px;font-size:12px;color:var(--ink-soft);margin-top:8px;white-space:pre-wrap;max-height:120px;overflow-y:auto;font-family:'IBM Plex Mono',monospace;}
+  .chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+  .chip{background:var(--paper2);border:1px solid var(--rule);border-radius:20px;padding:4px 10px;font-size:11.5px;color:var(--ink);cursor:pointer;}
+  .chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .warn-banner{background:var(--rust-bg);color:var(--rust);border:1px solid #E0BBAE;border-radius:6px;padding:9px 11px;font-size:12px;margin-bottom:12px;}
+  table.cmp{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px;}
+  table.cmp th{text-align:left;font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;padding:4px 6px;border-bottom:1px solid var(--rule);}
+  table.cmp td{padding:6px;border-bottom:1px solid var(--rule);}
+  #toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:20px;font-size:12.5px;z-index:40;opacity:0;transition:opacity 0.25s;pointer-events:none;}
+  #toast.show{opacity:1;}
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .login-card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:26px 22px;max-width:360px;width:100%;box-shadow:0 4px 16px rgba(0,0,0,0.12);}
+  .login-card .seal{width:44px;height:44px;border-radius:50%;border:2px solid var(--brass);display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-weight:600;font-size:17px;color:var(--brass);margin:0 auto 12px;}
+  .login-card h2{text-align:center;font-size:17px;}
+  .login-card p.sub{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:4px;}
+  .login-err{color:var(--rust);font-size:12px;margin-top:8px;text-align:center;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-wrap">
+  <div class="login-card">
+    <div class="seal">VR</div>
+    <h2>Vendor Register</h2>
+    <p class="sub">Sign in with the email and password your administrator gave you.</p>
+    <label>Email</label>
+    <input type="email" id="loginEmail" placeholder="name@yourcollege.example" autocomplete="off" spellcheck="false">
+    <label>Password</label>
+    <input type="password" id="loginPass" placeholder="Password" autocomplete="new-password">
+    <button class="btn brass full" id="loginBtn">Sign in</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<div id="app" style="display:none;">
+  <header class="topbar">
+    <div class="brand">
+      <div class="left">
+        <div class="seal">VR</div>
+        <div>
+          <h1>Vendor Register</h1>
+          <p id="whoami"></p>
+        </div>
+      </div>
+      <button class="signout" id="signOutBtn">Sign out</button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+  <main id="main"></main>
+  <button class="fab" id="fab" title="Add">+</button>
+</div>
+
+<div id="toast"></div>
+<div id="modalRoot"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+// ============================================================
+// STEP 1 OF SETUP: paste your Firebase project's web config here.
+// Get this from: Firebase console > Project settings > Your apps > Web app > SDK setup and configuration
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyCvSymvN44G2XvkjxEiuUTiXt1pBAHd9nM",
+  authDomain: "vendor-list-46418.firebaseapp.com",
+  projectId: "vendor-list-46418",
+  storageBucket: "vendor-list-46418.firebasestorage.app",
+  messagingSenderId: "759957688626",
+  appId: "1:759957688626:web:d95102fd7bfdf07c0ac72b"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// SESSION persistence: the login is only remembered for as long as this
+// browser tab/window stays open. Closing the browser (not just clicking
+// Sign out) forces a fresh password entry next time — nothing is saved
+// to disk.
+auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+</script>
+<script>
+const DEFAULT_CATEGORIES = ["Groceries & Provisions","Stationery & Printing","Electrical","Plumbing",
+  "Furniture & Mattresses","Welding & Fabrication","Uniforms & Textiles","Computers & IT Purchase",
+  "Computer & IT Repair","Computer Components","Projectors & AV","Transport",
+  "Civil & Construction Contracts","Sports Equipment","Lab Equipment","Other"];
+
+let state = { vendors: [], entries: [], categories: [...DEFAULT_CATEGORIES], role: null, uid: null, email: null };
+let currentView = 'dashboard';
+let compareQuery = '';
+let unsubVendors=null, unsubEntries=null, unsubCats=null;
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function fmtMoney(n){ n=Number(n)||0; return '₹'+n.toLocaleString('en-IN',{maximumFractionDigits:2}); }
+function fmtDate(d){ if(!d) return '—'; const dt=new Date(d+'T00:00:00'); if(isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(window._toastTimer); window._toastTimer=setTimeout(()=>t.classList.remove('show'),2400); }
+
+// ---------- IDLE AUTO-LOGOUT (5 minutes) ----------
+const IDLE_LIMIT_MS = 5 * 60 * 1000;
+let idleTimer = null;
+function resetIdleTimer(){
+  if(!auth.currentUser) return;
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(()=>{
+    if(auth.currentUser){
+      auth.signOut();
+    }
+  }, IDLE_LIMIT_MS);
+}
+['mousemove','mousedown','keydown','touchstart','scroll','click'].forEach(evt=>{
+  document.addEventListener(evt, resetIdleTimer, {passive:true});
+});
+
+// ---------- AUTH ----------
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.textContent = '';
+  if(!email || !pass){ errEl.textContent = 'Enter both email and password.'; return; }
+  try{
+    await auth.signInWithEmailAndPassword(email, pass);
+  }catch(e){
+    errEl.textContent = 'Sign-in failed. Check the email and password.';
+  }
+});
+document.getElementById('signOutBtn').addEventListener('click', ()=>auth.signOut());
+
+auth.onAuthStateChanged(async (user)=>{
+  if(unsubVendors) unsubVendors(); if(unsubEntries) unsubEntries(); if(unsubCats) unsubCats();
+  if(!user){
+    clearTimeout(idleTimer);
+    document.getElementById('loginScreen').style.display='flex';
+    document.getElementById('app').style.display='none';
+    if(window._wasSignedIn){
+      document.getElementById('loginErr').textContent = 'You were signed out (5 minutes of inactivity, or the browser was closed). Please sign in again.';
+    }
+    window._wasSignedIn = false;
+    return;
+  }
+  window._wasSignedIn = true;
+  resetIdleTimer();
+  state.uid = user.uid; state.email = user.email;
+  let roleDoc;
+  try{
+    roleDoc = await db.collection('users').doc(user.uid).get();
+  }catch(e){
+    document.getElementById('loginErr').textContent = 'Signed in, but access could not be verified. Contact your administrator.';
+    auth.signOut(); return;
+  }
+  if(!roleDoc.exists){
+    document.getElementById('loginErr').textContent = 'Your account has no role assigned yet. Ask your administrator to add you.';
+    auth.signOut(); return;
+  }
+  state.role = roleDoc.data().role || 'staff';
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('whoami').textContent = `${user.email} · ${state.role==='admin'?'Administrator':'Data entry'}`;
+  buildTabs();
+  attachListeners();
+  setView(state.role==='admin' ? 'dashboard' : 'add');
+});
+
+function buildTabs(){
+  const tabs = document.getElementById('tabs');
+  if(state.role==='admin'){
+    tabs.innerHTML = `
+      <button data-view="dashboard">Dashboard</button>
+      <button data-view="vendors">Vendors</button>
+      <button data-view="scan">Scan bill</button>
+      <button data-view="compare">Compare prices</button>
+      <button data-view="search">Search</button>`;
+  }else{
+    tabs.innerHTML = `
+      <button data-view="add">Add entry</button>
+      <button data-view="scan">Scan bill</button>
+      <button data-view="mine">My submissions</button>`;
+  }
+  tabs.addEventListener('click', e=>{ const b=e.target.closest('button[data-view]'); if(b) setView(b.dataset.view); });
+}
+
+function attachListeners(){
+  unsubVendors = db.collection('vendors').onSnapshot(snap=>{
+    state.vendors = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    render();
+  }, err=>{ console.warn('vendors listener', err.message); });
+
+  unsubCats = db.collection('meta').doc('categories').onSnapshot(doc=>{
+    const names = doc.exists ? (doc.data().names||[]) : [];
+    state.categories = Array.from(new Set([...DEFAULT_CATEGORIES, ...names]));
+    render();
+  }, err=>{});
+
+  if(state.role==='admin'){
+    unsubEntries = db.collection('entries').onSnapshot(snap=>{
+      state.entries = snap.docs.map(d=>({id:d.id, ...d.data()}));
+      render();
+    }, err=>{ console.warn('entries listener', err.message); });
+  }else{
+    unsubEntries = db.collection('entries').where('createdBy','==',state.uid).onSnapshot(snap=>{
+      state.entries = snap.docs.map(d=>({id:d.id, ...d.data()}));
+      render();
+    }, err=>{ console.warn('entries listener', err.message); });
+  }
+}
+
+// ---------- WRITE HELPERS ----------
+async function addVendor(v){ v.createdBy=state.uid; v.createdAt=Date.now(); await db.collection('vendors').doc(v.id).set(v); }
+async function updateVendor(v){ await db.collection('vendors').doc(v.id).set(v, {merge:true}); }
+async function deleteVendorDoc(id){ await db.collection('vendors').doc(id).delete(); }
+async function addEntry(e){ e.createdBy=state.uid; e.createdAt=Date.now();
+  await db.collection('entries').doc(e.id).set(e); }
+async function addCategory(name){
+  await db.collection('meta').doc('categories').set({
+    names: firebase.firestore.FieldValue.arrayUnion(name)
+  }, {merge:true});
+}
+async function saveBillImage(entryId, dataUrl){ await db.collection('billImages').doc(entryId).set({data:dataUrl, createdBy:state.uid, createdAt:Date.now()}); }
+
+function vendorById(id){ return state.vendors.find(v=>v.id===id); }
+function entriesForVendor(id){ return state.entries.filter(e=>e.vendorId===id).sort((a,b)=>b.date.localeCompare(a.date)); }
+function totalSpend(list){ return list.reduce((s,e)=>s+(Number(e.amount)||0),0); }
+
+// ---------- ROUTER ----------
+function setView(v){
+  currentView = v;
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('active', b.dataset.view===v));
+  document.getElementById('fab').style.display = (state.role==='admin' && (v==='vendors'||v==='dashboard')) ? 'block':'none';
+  render();
+}
+document.getElementById('fab').addEventListener('click', ()=>openVendorForm());
+
+function render(){
+  const main = document.getElementById('main');
+  if(state.role==='admin'){
+    if(currentView==='dashboard') return renderDashboard(main);
+    if(currentView==='vendors') return renderVendors(main);
+    if(currentView==='scan') return renderScan(main);
+    if(currentView==='compare') return renderCompare(main);
+    if(currentView==='search') return renderSearch(main);
+  }else{
+    if(currentView==='add') return renderStaffAdd(main);
+    if(currentView==='scan') return renderScan(main);
+    if(currentView==='mine') return renderMine(main);
+  }
+}
+
+// ---------- ADMIN: DASHBOARD ----------
+function renderDashboard(main){
+  const thisYear = new Date().getFullYear();
+  const yearEntries = state.entries.filter(e=> new Date(e.date+'T00:00:00').getFullYear()===thisYear);
+  const spendByCat = {};
+  state.entries.forEach(e=>{ const v=vendorById(e.vendorId); const cat=v?v.category:'Uncategorised';
+    spendByCat[cat]=(spendByCat[cat]||0)+(Number(e.amount)||0); });
+  const topCats = Object.entries(spendByCat).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxCat = topCats.length? topCats[0][1] : 1;
+  const recent = [...state.entries].sort((a,b)=>b.date.localeCompare(a.date) || (b.createdAt-a.createdAt)).slice(0,6);
+
+  let html = `<div class="stat-grid">
+    <div class="stat"><div class="label">Vendors</div><div class="value">${state.vendors.length}</div></div>
+    <div class="stat"><div class="label">Total spend recorded</div><div class="value brass">${fmtMoney(totalSpend(state.entries))}</div></div>
+    <div class="stat"><div class="label">Spend in ${thisYear}</div><div class="value green">${fmtMoney(totalSpend(yearEntries))}</div></div>
+    <div class="stat"><div class="label">Entries logged</div><div class="value">${state.entries.length}</div></div>
+  </div>`;
+  html += `<div class="card"><h3>Spend by category</h3>`;
+  if(topCats.length===0){ html += `<div class="empty">No entries yet.</div>`; }
+  else{ topCats.forEach(([cat,amt])=>{ const pct=Math.max(6,Math.round(amt/maxCat*100));
+    html += `<div style="margin:8px 0;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>${esc(cat)}</span><span class="mono">${fmtMoney(amt)}</span></div>
+      <div style="background:var(--paper2);border-radius:4px;height:8px;overflow:hidden;"><div style="background:var(--brass);width:${pct}%;height:100%;"></div></div></div>`; }); }
+  html += `</div>`;
+  html += `<div class="card"><h3>Recent entries</h3>`;
+  if(recent.length===0){ html += `<div class="empty">Nothing logged yet.</div>`; }
+  else{ recent.forEach(e=>{ const v=vendorById(e.vendorId);
+    html += `<div class="entry-row"><div><div class="desc">${esc(e.description)}</div><div class="sub">${esc(v?v.name:'Unknown vendor')} · ${fmtDate(e.date)}</div></div><div class="amt">${fmtMoney(e.amount)}</div></div>`; }); }
+  html += `</div>`;
+  main.innerHTML = html;
+}
+
+// ---------- ADMIN: VENDORS ----------
+function renderVendors(main){
+  main.innerHTML = `<div class="search-box"><input type="text" id="vendorSearch" placeholder="Search vendor name, category, phone…"></div>
+    <div class="chip-row" id="catChips"></div><div id="vendorList" style="margin-top:10px;"></div>`;
+  const chipRow = document.getElementById('catChips');
+  const usedCats = Array.from(new Set(state.vendors.map(v=>v.category))).sort();
+  chipRow.innerHTML = `<span class="chip active" data-cat="">All</span>` + usedCats.map(c=>`<span class="chip" data-cat="${esc(c)}">${esc(c)}</span>`).join('');
+  let activeCat = '';
+  function draw(){
+    const q = document.getElementById('vendorSearch').value.trim().toLowerCase();
+    let list = state.vendors.filter(v=>{
+      const matchQ = !q || [v.name,v.category,v.phone,v.email].join(' ').toLowerCase().includes(q);
+      const matchC = !activeCat || v.category===activeCat;
+      return matchQ && matchC;
+    }).sort((a,b)=>a.name.localeCompare(b.name));
+    const listEl = document.getElementById('vendorList');
+    if(list.length===0){ listEl.innerHTML = `<div class="empty">No vendors match. Tap + to add one.</div>`; return; }
+    listEl.innerHTML = list.map(v=>{ const spend=totalSpend(entriesForVendor(v.id));
+      return `<div class="vendor-item" data-id="${v.id}"><div class="name">${esc(v.name)}</div>
+      <div class="meta"><span class="badge cat">${esc(v.category)}</span> &nbsp; ${esc(v.phone||'no phone on file')} &nbsp;·&nbsp; <span class="mono">${fmtMoney(spend)}</span> total</div></div>`; }).join('');
+    listEl.querySelectorAll('.vendor-item').forEach(el=>el.addEventListener('click', ()=>openVendorDetail(el.dataset.id)));
+  }
+  document.getElementById('vendorSearch').addEventListener('input', draw);
+  chipRow.addEventListener('click', e=>{ const c=e.target.closest('.chip'); if(!c) return;
+    activeCat=c.dataset.cat; chipRow.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x===c)); draw(); });
+  draw();
+}
+
+function openVendorForm(existing){
+  const v = existing || {id:uid(), name:'', category:state.categories[0], phone:'', email:'', address:'', notes:''};
+  const isNew = !existing;
+  const catOptions = state.categories.map(c=>`<option value="${esc(c)}" ${c===v.category?'selected':''}>${esc(c)}</option>`).join('');
+  showModal(`${isNew?'Add vendor':'Edit vendor'}`, `
+    <label>Vendor / firm name</label><input id="f_name" value="${esc(v.name)}" placeholder="e.g. Sri Balaji Electricals">
+    <label>Category</label><select id="f_cat">${catOptions}<option value="__new">+ New category…</option></select>
+    <input id="f_catNew" placeholder="Type new category name" style="display:none;margin-top:6px;">
+    <label>Phone</label><input id="f_phone" value="${esc(v.phone)}" placeholder="10-digit mobile / landline">
+    <label>Email (optional)</label><input id="f_email" value="${esc(v.email)}" placeholder="vendor@example.com">
+    <label>Address (optional)</label><textarea id="f_addr" placeholder="Shop / office address">${esc(v.address)}</textarea>
+    <label>Notes (optional)</label><textarea id="f_notes" placeholder="GST no, terms, contact person">${esc(v.notes)}</textarea>
+    <div class="row" style="margin-top:14px;">
+      ${!isNew?`<button class="btn outline" id="deleteVendor">Delete vendor</button>`:''}
+      <button class="btn brass full" id="saveVendor">Save vendor</button>
+    </div>`);
+  document.getElementById('f_cat').addEventListener('change', e=>{ document.getElementById('f_catNew').style.display = e.target.value==='__new'?'block':'none'; });
+  document.getElementById('saveVendor').addEventListener('click', async ()=>{
+    const name = document.getElementById('f_name').value.trim();
+    if(!name){ toast('Enter a vendor name first.'); return; }
+    let cat = document.getElementById('f_cat').value;
+    if(cat==='__new'){ const nc=document.getElementById('f_catNew').value.trim();
+      if(!nc){ toast('Type the new category name.'); return; } cat=nc;
+      if(!state.categories.includes(nc)) await addCategory(nc); }
+    v.name=name; v.category=cat; v.phone=document.getElementById('f_phone').value.trim();
+    v.email=document.getElementById('f_email').value.trim(); v.address=document.getElementById('f_addr').value.trim();
+    v.notes=document.getElementById('f_notes').value.trim();
+    if(isNew) await addVendor(v); else await updateVendor(v);
+    closeModal(); toast('Vendor saved.');
+  });
+  const delBtn = document.getElementById('deleteVendor');
+  if(delBtn) delBtn.addEventListener('click', async ()=>{
+    if(!confirm('Delete this vendor? Its past entries stay in the records but lose the vendor link.')) return;
+    await deleteVendorDoc(v.id); closeModal(); toast('Vendor deleted.'); setView('vendors');
+  });
+}
+
+function openVendorDetail(id){
+  const v = vendorById(id); if(!v) return;
+  const entries = entriesForVendor(id); const spend = totalSpend(entries);
+  const groups = {};
+  entries.slice().reverse().forEach(e=>{ const key=e.description.trim().toLowerCase(); (groups[key]=groups[key]||[]).push(e); });
+  let trendsHtml = '';
+  Object.values(groups).forEach(list=>{ if(list.length<2) return;
+    const last=list[list.length-1], prev=list[list.length-2];
+    const diff=(Number(last.amount)-Number(prev.amount));
+    const pct=prev.amount? Math.round(diff/Number(prev.amount)*1000)/10 : 0;
+    const cls=diff>0?'up':diff<0?'down':'flat'; const arrow=diff>0?'↑':diff<0?'↓':'→';
+    trendsHtml += `<div class="entry-row"><div><div class="desc">${esc(last.description)}</div>
+      <div class="sub">${fmtDate(prev.date)} → ${fmtDate(last.date)}: ${fmtMoney(prev.amount)} → ${fmtMoney(last.amount)}</div></div>
+      <div class="price-trend ${cls}">${arrow} ${Math.abs(pct)}%</div></div>`; });
+  const body = `<div class="card" style="margin-bottom:10px;">
+      <div class="badge cat" style="margin-bottom:6px;">${esc(v.category)}</div>
+      <div style="font-size:12.5px;line-height:1.8;">
+        ${v.phone?`<div>${esc(v.phone)}</div>`:''}${v.email?`<div>${esc(v.email)}</div>`:''}
+        ${v.address?`<div>${esc(v.address)}</div>`:''}${v.notes?`<div style="color:var(--ink-soft);margin-top:4px;">${esc(v.notes)}</div>`:''}
+      </div></div>
+    <div class="stat-grid">
+      <div class="stat"><div class="label">Total paid</div><div class="value brass">${fmtMoney(spend)}</div></div>
+      <div class="stat"><div class="label">Entries</div><div class="value">${entries.length}</div></div>
+    </div>
+    ${trendsHtml? `<div class="card"><h3>Price movement</h3>${trendsHtml}</div>` : ''}
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3>Purchase / service history</h3><button class="btn small brass" id="addEntryBtn">+ Log entry</button></div>
+      <div id="entryList" style="margin-top:8px;">
+        ${entries.length===0? '<div class="empty">No purchases logged yet.</div>' :
+          entries.map(e=>`<div class="entry-row"><div><div class="desc">${esc(e.description)}</div>
+            <div class="sub">${fmtDate(e.date)} · ${e.itemType==='service'?'Service':'Product'} ${e.hasBill?'<span class="badge paid">Bill on file</span>':'<span class="badge nobill">No bill</span>'}</div></div>
+            <div class="amt">${fmtMoney(e.amount)}</div></div>`).join('')}
+      </div></div>
+    <button class="btn outline full" id="editVendorBtn">Edit vendor details</button>`;
+  showModal(v.name, body, true);
+  document.getElementById('addEntryBtn').addEventListener('click', ()=>openEntryForm(v.id));
+  document.getElementById('editVendorBtn').addEventListener('click', ()=>openVendorForm(v));
+}
+
+function openEntryForm(vendorId, prefill, onDone){
+  const v = vendorById(vendorId);
+  const e = {id:uid(), vendorId, date:todayStr(), itemType:'product', description:'', amount:'', hasBill:true, notes:'', ...(prefill||{})};
+  showModal(`Log entry — ${v?v.name:''}`, `
+    <label>Date</label><input type="date" id="e_date" value="${e.date}">
+    <label>Type</label><div class="chip-row">
+      <span class="chip ${e.itemType==='product'?'active':''}" data-type="product">Product purchased</span>
+      <span class="chip ${e.itemType==='service'?'active':''}" data-type="service">Service received</span></div>
+    <label>Description (item / service name)</label>
+    <input id="e_desc" value="${esc(e.description)}" placeholder="e.g. Green chalkboard 4x6 ft, or AMC computer service">
+    <label>Amount paid</label><input type="number" id="e_amt" value="${e.amount}" placeholder="0.00" step="0.01">
+    <label>Bill available?</label><div class="chip-row">
+      <span class="chip ${e.hasBill?'active':''}" data-bill="yes">Yes, bill on file</span>
+      <span class="chip ${!e.hasBill?'active':''}" data-bill="no">No bill, contact only</span></div>
+    <label>Notes (optional)</label><textarea id="e_notes" placeholder="PO number, quality remarks">${esc(e.notes||'')}</textarea>
+    <button class="btn brass full" id="saveEntry">Save entry</button>`);
+  let itemType=e.itemType, hasBill=e.hasBill;
+  document.querySelectorAll('[data-type]').forEach(chip=>chip.addEventListener('click', ()=>{ itemType=chip.dataset.type;
+    document.querySelectorAll('[data-type]').forEach(c=>c.classList.toggle('active',c===chip)); }));
+  document.querySelectorAll('[data-bill]').forEach(chip=>chip.addEventListener('click', ()=>{ hasBill=chip.dataset.bill==='yes';
+    document.querySelectorAll('[data-bill]').forEach(c=>c.classList.toggle('active',c===chip)); }));
+  document.getElementById('saveEntry').addEventListener('click', async ()=>{
+    const desc = document.getElementById('e_desc').value.trim();
+    const amt = document.getElementById('e_amt').value;
+    if(!desc){ toast('Describe what was purchased or serviced.'); return; }
+    if(amt===''||isNaN(Number(amt))){ toast('Enter a valid amount.'); return; }
+    e.date=document.getElementById('e_date').value||todayStr(); e.description=desc; e.amount=Number(amt);
+    e.itemType=itemType; e.hasBill=hasBill; e.notes=document.getElementById('e_notes').value.trim();
+    await addEntry(e); closeModal(); toast('Entry logged.');
+    if(onDone) onDone(); else if(state.role==='admin') openVendorDetail(vendorId);
+  });
+}
+
+// ---------- ADMIN: SCAN / COMPARE / SEARCH ----------
+let tesseractLoading = false;
+function ensureTesseract(){
+  return new Promise((resolve,reject)=>{
+    if(window.Tesseract){ resolve(); return; }
+    if(tesseractLoading){ const iv=setInterval(()=>{ if(window.Tesseract){ clearInterval(iv); resolve(); } },300);
+      setTimeout(()=>{ clearInterval(iv); if(!window.Tesseract) reject(new Error('timeout')); },20000); return; }
+    tesseractLoading = true;
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js';
+    s.onload = ()=>resolve(); s.onerror = ()=>reject(new Error('load failed'));
+    document.body.appendChild(s);
+  });
+}
+function resizeImage(dataUrl, maxW){
+  return new Promise(resolve=>{ const img=new Image();
+    img.onload=()=>{ const scale=Math.min(1,maxW/img.width); const canvas=document.createElement('canvas');
+      canvas.width=img.width*scale; canvas.height=img.height*scale;
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      resolve(canvas.toDataURL('image/jpeg',0.6)); };
+    img.src = dataUrl; });
+}
+function guessFromText(text){
+  const amounts = Array.from(text.matchAll(/(?:₹|rs\.?|inr)\s?([\d,]+(?:\.\d{1,2})?)/gi)).map(m=>parseFloat(m[1].replace(/,/g,'')));
+  const bareNums = Array.from(text.matchAll(/\b(\d{2,3}(?:,\d{2,3})*(?:\.\d{1,2})?)\b/g)).map(m=>parseFloat(m[1].replace(/,/g,'')));
+  const allAmt = amounts.length? amounts : bareNums;
+  const guessedAmount = allAmt.length? Math.max(...allAmt) : '';
+  const dateMatch = text.match(/\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})\b/);
+  let guessedDate = '';
+  if(dateMatch){ let [_,d,m,y]=dateMatch; if(y.length===2) y='20'+y;
+    if(Number(d)>31||Number(m)>12){ [d,m]=[m,d]; }
+    guessedDate = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+  return { guessedAmount, guessedDate };
+}
+function renderScan(main){
+  main.innerHTML = `<div class="card"><h3>Scan a bill</h3>
+    <p class="hint">Take a photo or upload a bill. This reads the text on-device and guesses amount and date — always check before saving.</p>
+    <input type="file" id="billFile" accept="image/*" capture="environment" style="margin-top:10px;">
+    <div id="scanStatus" class="hint" style="margin-top:8px;"></div>
+    <div id="ocrResult" style="display:none;">
+      <div class="ocr-box" id="ocrText"></div>
+      <label>Vendor</label><select id="s_vendor"></select>
+      <label>Date</label><input type="date" id="s_date">
+      <label>Description</label><input id="s_desc" placeholder="What was this bill for?">
+      <label>Amount</label><input type="number" id="s_amt" step="0.01">
+      <button class="btn brass full" id="s_save">Save as entry</button>
+    </div></div>`;
+  const vendorSelect = document.getElementById('s_vendor');
+  const canPickAny = state.role==='admin';
+  const vendorPool = state.vendors.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  vendorSelect.innerHTML = vendorPool.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('') +
+    (canPickAny? `<option value="__new">+ New vendor…</option>` : '');
+  if(vendorPool.length===0){ vendorSelect.innerHTML = canPickAny? `<option value="__new">+ New vendor…</option>` : `<option value="">No vendors yet — ask admin to add one</option>`; }
+
+  document.getElementById('billFile').addEventListener('change', async (ev)=>{
+    const file = ev.target.files[0]; if(!file) return;
+    const status = document.getElementById('scanStatus'); status.textContent='Reading image…';
+    const reader = new FileReader();
+    reader.onload = async ()=>{
+      const small = await resizeImage(reader.result, 900);
+      window._pendingBillImage = small;
+      status.textContent = 'Loading text reader (first time only)…';
+      try{
+        await ensureTesseract();
+        status.textContent = 'Scanning text — this can take up to a minute…';
+        const { data } = await window.Tesseract.recognize(small, 'eng');
+        const text = data.text || '';
+        status.textContent = 'Scan complete. Review the details below.';
+        document.getElementById('ocrResult').style.display = 'block';
+        document.getElementById('ocrText').textContent = text.trim() || '(no readable text found)';
+        const { guessedAmount, guessedDate } = guessFromText(text);
+        document.getElementById('s_amt').value = guessedAmount || '';
+        document.getElementById('s_date').value = guessedDate || todayStr();
+      }catch(err){
+        status.textContent = 'Automatic reading isn\'t available right now — enter details manually.';
+        document.getElementById('ocrResult').style.display = 'block';
+        document.getElementById('ocrText').textContent = '(text reader unavailable)';
+        document.getElementById('s_date').value = todayStr();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('s_save').addEventListener('click', async ()=>{
+    let vendorId = vendorSelect.value;
+    if(vendorId==='__new'){
+      const name = prompt('New vendor name:'); if(!name){ toast('Enter a vendor name.'); return; }
+      const nv = {id:uid(), name:name.trim(), category:state.categories[0], phone:'', email:'', address:'', notes:''};
+      await addVendor(nv); vendorId = nv.id;
+    }
+    if(!vendorId){ toast('Choose a vendor first.'); return; }
+    const desc = document.getElementById('s_desc').value.trim();
+    const amt = document.getElementById('s_amt').value;
+    const date = document.getElementById('s_date').value || todayStr();
+    if(!desc){ toast('Add a short description of the bill.'); return; }
+    if(amt===''||isNaN(Number(amt))){ toast('Enter a valid amount.'); return; }
+    const entryId = uid();
+    const entry = {id:entryId, vendorId, date, itemType:'product', description:desc, amount:Number(amt), hasBill:true, notes:''};
+    await addEntry(entry);
+    if(window._pendingBillImage){ await saveBillImage(entryId, window._pendingBillImage); window._pendingBillImage=null; }
+    toast('Bill saved to vendor register.');
+    setView(state.role==='admin' ? 'vendors' : 'mine');
+  });
+}
+
+function renderCompare(main){
+  main.innerHTML = `<div class="card"><h3>Compare prices over time</h3>
+    <p class="hint">Type any item or service to see how prices moved across dates and vendors.</p>
+    <input type="text" id="cmpQuery" placeholder="Search item or service…" value="${esc(compareQuery)}"></div>
+    <div id="cmpResult"></div>`;
+  function draw(){
+    const q = document.getElementById('cmpQuery').value.trim().toLowerCase(); compareQuery=q;
+    const resultEl = document.getElementById('cmpResult');
+    if(!q){ resultEl.innerHTML=''; return; }
+    const matches = state.entries.filter(e=>e.description.toLowerCase().includes(q)).sort((a,b)=>a.date.localeCompare(b.date));
+    if(matches.length===0){ resultEl.innerHTML = `<div class="empty">No entries match "${esc(q)}" yet.</div>`; return; }
+    let rows=''; let prevByVendor={};
+    matches.forEach(e=>{ const v=vendorById(e.vendorId); const key=e.vendorId; let deltaHtml='—';
+      if(prevByVendor[key]!==undefined){ const diff=e.amount-prevByVendor[key];
+        const pct=prevByVendor[key]? Math.round(diff/prevByVendor[key]*1000)/10 : 0;
+        const cls=diff>0?'up':diff<0?'down':'flat';
+        deltaHtml = `<span class="price-trend ${cls}">${diff>0?'↑':diff<0?'↓':'→'} ${Math.abs(pct)}%</span>`; }
+      prevByVendor[key]=e.amount;
+      rows += `<tr><td>${fmtDate(e.date)}</td><td>${esc(v?v.name:'—')}</td><td>${esc(e.description)}</td><td class="mono">${fmtMoney(e.amount)}</td><td>${deltaHtml}</td></tr>`; });
+    resultEl.innerHTML = `<div class="card"><table class="cmp"><tr><th>Date</th><th>Vendor</th><th>Item</th><th>Amount</th><th>vs last</th></tr>${rows}</table></div>`;
+  }
+  document.getElementById('cmpQuery').addEventListener('input', draw);
+  if(compareQuery) draw();
+}
+
+function renderSearch(main){
+  main.innerHTML = `<div class="card"><input type="text" id="globalSearch" placeholder="Search vendors, items, notes…"></div><div id="searchResults"></div>`;
+  document.getElementById('globalSearch').addEventListener('input', e=>{
+    const q = e.target.value.trim().toLowerCase(); const resultsEl = document.getElementById('searchResults');
+    if(!q){ resultsEl.innerHTML=''; return; }
+    const vendorHits = state.vendors.filter(v=>[v.name,v.category,v.phone,v.email,v.notes].join(' ').toLowerCase().includes(q));
+    const entryHits = state.entries.filter(en=>en.description.toLowerCase().includes(q) || (en.notes||'').toLowerCase().includes(q));
+    let html='';
+    if(vendorHits.length){ html += `<div class="divider-label">Vendors</div>`;
+      vendorHits.forEach(v=>{ html += `<div class="vendor-item" data-id="${v.id}"><div class="name">${esc(v.name)}</div>
+        <div class="meta"><span class="badge cat">${esc(v.category)}</span> ${esc(v.phone||'')}</div></div>`; }); }
+    if(entryHits.length){ html += `<div class="divider-label">Entries</div><div class="card">`;
+      entryHits.slice(0,30).forEach(en=>{ const v=vendorById(en.vendorId);
+        html += `<div class="entry-row"><div><div class="desc">${esc(en.description)}</div><div class="sub">${esc(v?v.name:'—')} · ${fmtDate(en.date)}</div></div><div class="amt">${fmtMoney(en.amount)}</div></div>`; });
+      html += `</div>`; }
+    if(!vendorHits.length && !entryHits.length){ html = `<div class="empty">Nothing found for "${esc(q)}".</div>`; }
+    resultsEl.innerHTML = html;
+    resultsEl.querySelectorAll('.vendor-item').forEach(el=>el.addEventListener('click', ()=>openVendorDetail(el.dataset.id)));
+  });
+}
+
+// ---------- STAFF VIEWS ----------
+function renderStaffAdd(main){
+  main.innerHTML = `<div class="card"><h3>Add a purchase / bill entry</h3>
+    <p class="hint">Pick the vendor, fill in the details, and save. You won't see other staff's entries or vendor totals — only what you enter.</p>
+    <label>Vendor</label><select id="st_vendor"></select>
+    <button class="btn brass full" id="st_open">Continue</button></div>`;
+  const vendorSelect = document.getElementById('st_vendor');
+  const pool = state.vendors.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  vendorSelect.innerHTML = pool.length? pool.map(v=>`<option value="${v.id}">${esc(v.name)} — ${esc(v.category)}</option>`).join('')
+    : `<option value="">No vendors yet — ask your administrator to add one</option>`;
+  document.getElementById('st_open').addEventListener('click', ()=>{
+    const id = vendorSelect.value; if(!id){ toast('No vendor available yet.'); return; }
+    openEntryForm(id, null, ()=>setView('mine'));
+  });
+}
+function renderMine(main){
+  const mine = [...state.entries].sort((a,b)=>b.date.localeCompare(a.date));
+  main.innerHTML = `<div class="card"><h3>Your submissions</h3>
+    ${mine.length===0? '<div class="empty">You haven\'t logged anything yet.</div>' :
+      mine.map(e=>{ const v=vendorById(e.vendorId);
+        return `<div class="entry-row"><div><div class="desc">${esc(e.description)}</div>
+          <div class="sub">${esc(v?v.name:'—')} · ${fmtDate(e.date)}</div></div><div class="amt">${fmtMoney(e.amount)}</div></div>`; }).join('')}
+  </div>`;
+}
+
+// ---------- MODAL ----------
+function showModal(title, bodyHtml){
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `<div class="modal-bg" id="modalBg"><div class="modal">
+    <div class="modal-head"><h2>${esc(title)}</h2><button class="close-x" id="modalClose">&times;</button></div>
+    ${bodyHtml}</div></div>`;
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalBg').addEventListener('click', e=>{ if(e.target.id==='modalBg') closeModal(); });
+}
+function closeModal(){ document.getElementById('modalRoot').innerHTML=''; }
+</script>
+</body>
+</html>
